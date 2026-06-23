@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0e1419" />
+    <meta
+      name="description"
+      content="Hnefatafl (Viking chess) — an installable, offline-capable board game."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <title>Hnefatafl — Viking Chess</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <h1 class="title">ᚺ Hnefatafl</h1>
+        <p id="status" class="status">Defenders to move</p>
+      </header>
+
+      <main class="stage">
+        <canvas id="board" aria-label="Hnefatafl board"></canvas>
+      </main>
+
+      <section class="panel">
+        <div class="controls">
+          <button id="new-game" class="btn">New game</button>
+          <button id="undo" class="btn">Undo</button>
+        </div>
+
+        <div class="settings">
+          <label>
+            Variant
+            <select id="variant"></select>
+          </label>
+          <label>
+            Mode
+            <select id="mode">
+              <option value="ai">Human vs AI</option>
+              <option value="two-player">Two players</option>
+            </select>
+          </label>
+          <label id="ai-side-row">
+            AI plays
+            <select id="ai-side">
+              <option value="attackers">Attackers</option>
+              <option value="defenders">Defenders</option>
+            </select>
+          </label>
+          <label id="difficulty-row">
+            Difficulty
+            <select id="difficulty">
+              <option value="1">Easy (depth 1)</option>
+              <option value="2" selected>Normal (depth 2)</option>
+              <option value="3">Hard (depth 3)</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="history">
+          <h2>Moves</h2>
+          <ol id="move-list"></ol>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

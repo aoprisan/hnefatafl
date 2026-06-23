@@ -1,0 +1,20 @@
+{
+  "name": "hnefatafl-pwa",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Hnefatafl (Viking chess) — an installable, offline-capable PWA built with TypeScript + Vite.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2",
+    "vite-plugin-pwa": "^0.20.5",
+    "vitest": "^2.0.5"
+  }
+}
