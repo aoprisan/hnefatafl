@@ -3,7 +3,9 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  base: "./",
+  // Served from the domain root in dev; GitHub Pages builds set VITE_BASE to
+  // "/<repo>/" so asset and service-worker paths resolve under the subpath.
+  base: process.env.VITE_BASE ?? "/",
   plugins: [
     VitePWA({
       registerType: "autoUpdate",
