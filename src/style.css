@@ -152,8 +152,134 @@ body {
   border-radius: 8px;
 }
 
-.settings label.hidden {
-  display: none;
+.settings label.hidden,
+.hidden {
+  display: none !important;
+}
+
+.btn.toggle.active {
+  background: rgba(214, 80, 74, 0.22);
+  border-color: rgba(214, 80, 74, 0.8);
+  color: #ffd9d6;
+}
+
+.blurb {
+  margin: -4px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Saga panel */
+.saga {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #18242f, #131c25);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saga-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.saga-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--gold);
+}
+
+.saga-progress {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.saga-intro {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.saga-boons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.boon-chip {
+  background: rgba(110, 200, 150, 0.16);
+  border: 1px solid rgba(110, 200, 150, 0.5);
+  color: #b9e8cc;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-weight: 600;
+}
+
+.boon-draft h3 {
+  margin: 6px 0;
+  font-size: 0.85rem;
+  color: var(--gold);
+}
+
+.boon-choices {
+  display: grid;
+  gap: 8px;
+}
+
+.boon-card {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.boon-card:hover {
+  border-color: var(--gold);
+  background: #243341;
+}
+
+.boon-card strong {
+  color: var(--gold);
+}
+
+.boon-card span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  max-width: 92vw;
+  background: #1d2935;
+  color: var(--text);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  word-break: break-all;
 }
 
 .history h2 {

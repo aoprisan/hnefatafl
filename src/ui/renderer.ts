@@ -6,6 +6,10 @@ export interface RenderState {
   selected: Coord | null;
   legalTargets: Coord[];
   lastMove: AppliedMove | null;
+  /** Squares of your pieces the enemy could capture next turn ("Raven's Sight"). */
+  danger?: Coord[];
+  /** The king's shortest route to a corner, highlighted as a hint. */
+  escapePath?: Coord[] | null;
 }
 
 /**
@@ -71,12 +75,27 @@ export class BoardRenderer {
           ctx.fillStyle = "rgba(255,255,255,0.025)";
           ctx.fillRect(x, y, cell, cell);
         }
-        if (board.isCorner(c) || board.isThrone(c)) {
+        if (board.isBlocked(c)) {
+          this.drawBlocked(x, y);
+        } else if (board.isSanctuary(c)) {
+          ctx.fillStyle = "rgba(86,166,116,0.14)";
+          ctx.fillRect(x, y, cell, cell);
+          this.drawSanctuaryGlyph(c);
+        } else if (board.isCorner(c) || board.isThrone(c)) {
           ctx.fillStyle = "rgba(214,168,74,0.12)";
           ctx.fillRect(x, y, cell, cell);
           this.drawSpecialGlyph(c, board.isThrone(c));
         }
       }
+    }
+
+    // Danger overlay (squares the enemy could capture next turn).
+    if (state.danger) {
+      for (const d of state.danger) this.drawDanger(d);
+    }
+    // King escape-route hint.
+    if (state.escapePath && state.escapePath.length > 1) {
+      this.drawEscapePath(state.escapePath);
     }
 
     // Grid lines.
@@ -159,6 +178,82 @@ export class BoardRenderer {
     ctx.lineTo(cx + r, cy + r);
     ctx.moveTo(cx + r, cy - r);
     ctx.lineTo(cx - r, cy + r);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  private drawBlocked(x: number, y: number): void {
+    const ctx = this.ctx;
+    const cell = this.cell;
+    const g = ctx.createLinearGradient(x, y, x + cell, y + cell);
+    g.addColorStop(0, "#1a2733");
+    g.addColorStop(1, "#0d161e");
+    ctx.fillStyle = g;
+    ctx.fillRect(x, y, cell, cell);
+    // A few ice/stone cracks.
+    ctx.strokeStyle = "rgba(120,150,170,0.25)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + cell * 0.2, y + cell * 0.7);
+    ctx.lineTo(x + cell * 0.5, y + cell * 0.4);
+    ctx.lineTo(x + cell * 0.8, y + cell * 0.6);
+    ctx.stroke();
+  }
+
+  private drawSanctuaryGlyph(c: Coord): void {
+    const ctx = this.ctx;
+    const cell = this.cell;
+    const cx = c.col * cell + cell / 2;
+    const cy = c.row * cell + cell / 2;
+    const r = cell * 0.28;
+    ctx.save();
+    ctx.strokeStyle = "rgba(110,200,150,0.6)";
+    ctx.lineWidth = 1.6;
+    // A simple stylised tree/rune.
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + r);
+    ctx.lineTo(cx, cy - r);
+    ctx.moveTo(cx, cy - r * 0.3);
+    ctx.lineTo(cx - r * 0.7, cy - r);
+    ctx.moveTo(cx, cy - r * 0.3);
+    ctx.lineTo(cx + r * 0.7, cy - r);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  private drawDanger(c: Coord): void {
+    const ctx = this.ctx;
+    const cell = this.cell;
+    ctx.save();
+    ctx.fillStyle = "rgba(214,80,74,0.22)";
+    ctx.fillRect(c.col * cell, c.row * cell, cell, cell);
+    ctx.strokeStyle = "rgba(214,80,74,0.7)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(c.col * cell + 2, c.row * cell + 2, cell - 4, cell - 4);
+    ctx.restore();
+  }
+
+  private drawEscapePath(path: Coord[]): void {
+    const ctx = this.ctx;
+    const cell = this.cell;
+    ctx.save();
+    ctx.strokeStyle = "rgba(110,200,150,0.85)";
+    ctx.lineWidth = Math.max(2, cell * 0.07);
+    ctx.setLineDash([cell * 0.18, cell * 0.14]);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    path.forEach((p, i) => {
+      const x = p.col * cell + cell / 2;
+      const y = p.row * cell + cell / 2;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    // Mark the goal corner.
+    const goal = path[path.length - 1];
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.arc(goal.col * cell + cell / 2, goal.row * cell + cell / 2, cell * 0.2, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }

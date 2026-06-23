@@ -12,6 +12,26 @@ No backend, no game libraries — pure TypeScript for the rules engine and a
 - 📦 Offline-capable & **installable** (service worker + web manifest)
 - 🧩 **Data-driven** variants — ships with Fetlar 11×11 and Brandub 7×7
 
+### The twists ⚔️
+
+These are what make this build stand out beyond a plain tafl board:
+
+- **🗺️ Saga mode (roguelike campaign).** Lead the king's party through escalating
+  battles (Brandub → the hall → the Frozen Fjord). Win a battle and **draft a
+  persistent boon** for the rest of the run — Shieldwall, extra Huscarls, Sacred
+  Groves, Thinned Ranks, or Odin's Raven's Sight. Later battles add **terrain**:
+  impassable ice/rivers and sacred groves that act as extra hostile squares.
+  Progress is saved locally (`localStorage`).
+- **🧔 Jarl AI personalities.** The same engine, three temperaments — *Ragnar the
+  Reckless* (blood-thirsty), *Björn the Patient* (boxes you in), *Hilda
+  Wall-Builder* (balanced) — implemented purely as evaluation-weight presets.
+- **👁 Raven's Sight (danger overlay).** Toggle a heatmap of every square the
+  enemy could capture on their next move, plus the **king's shortest escape
+  route** to a corner — turning a brutal game into a learnable one.
+- **🔗 Shareable-link correspondence play.** The whole game state is encoded into
+  a URL (no backend). Hit **Share**, send the link, your opponent moves and
+  shares it back. Async tafl that still runs entirely offline.
+
 ## Run it
 
 ```bash
@@ -62,10 +82,13 @@ src/
   game/            # pure rules engine — no DOM, no rendering
     types.ts       #   Coord, Piece, Move, Side, Variant, GameStatus
     variants.ts    #   data-driven layouts (Fetlar 11×11, Brandub 7×7)
-    board.ts       #   Board state + special-square predicates
+    board.ts       #   Board state + special-square predicates + terrain
     rules.ts       #   legal moves, capture resolution, win detection
     game.ts        #   Game controller: turns, history, undo
-    ai.ts          #   minimax + alpha-beta over a material/king eval
+    ai.ts          #   minimax + alpha-beta; Jarl personalities (eval weights)
+    analysis.ts    #   threat overlay + king escape-path search
+    share.ts       #   URL-safe game serialization for correspondence play
+    saga.ts        #   roguelike campaign: battles, boons, terrain, persistence
   ui/
     renderer.ts    # canvas rendering + pointer→square hit-testing
   main.ts          # wires game + renderer + controls + PWA registration
@@ -85,9 +108,16 @@ difficulty are configurable in the UI.
 ### Adding a variant
 
 Variants are **pure data**. Add a `Variant` to `src/game/variants.ts` (board
-size, throne, corners, and starting coordinates) and register it in `VARIANTS`;
-it appears in the variant selector automatically. The engine reads everything
-from the variant — no rules code changes needed for board size or layout.
+size, throne, corners, starting coordinates, and optional `blocked` /
+`sanctuaries` terrain) and register it in `VARIANTS`; it appears in the variant
+selector automatically. The engine reads everything from the variant — no rules
+code changes needed for board size, layout, or terrain.
+
+### Adding a Saga battle or boon
+
+`src/game/saga.ts` is also pure data. Append a `Battle` to `SAGA` (base variant,
+extra terrain, enemy Jarl, depth) or a `Boon` to `BOONS` (an `apply` that mutates
+the per-run loadout). The campaign UI picks them up automatically.
 
 ## Tests
 
@@ -98,7 +128,10 @@ npm test
 Covers capture mechanics (basic custodial, hostile-square captures against the
 empty throne and corners, "safe to move into a sandwich", multi-capture, and the
 king's immunity to flanking), king-capture conditions (including throne / corner
-/ edge as a wall), king escape, move generation, and the game controller.
+/ edge as a wall), king escape, move generation, and the game controller — plus
+the twists: terrain (rivers block movement & count as king walls; sacred groves
+as hostile anchors), the Shieldwall rule flag, the threat overlay, king
+escape-path search, and share-link round-tripping (34 tests).
 
 ## License
 

@@ -62,4 +62,44 @@ export interface Variant {
    * second flank of a capture). Standard Fetlar rules: yes.
    */
   hostileThrone: boolean;
+
+  // --- Optional terrain (used by the Saga campaign; empty by default) ---
+
+  /**
+   * Impassable squares (rivers / mountains). No piece may stop on or pass
+   * through them, they are never a capture anchor, but they count as a wall
+   * when surrounding the king.
+   */
+  blocked?: Coord[];
+  /**
+   * Sacred groves: extra hostile squares. Any piece may stop on or pass
+   * through them; while empty they act as a capture anchor for both sides and
+   * count as a king-surround wall. They are NOT escape squares.
+   */
+  sanctuaries?: Coord[];
+}
+
+/**
+ * Tunable rule flags. Standard play uses the defaults derived from a variant;
+ * the Saga campaign's boons flip these to bend the rules.
+ */
+export interface RuleFlags {
+  /** Empty throne acts as a capture anchor. */
+  hostileThrone: boolean;
+  /** Corners act as capture anchors. */
+  hostileCorners: boolean;
+  /**
+   * "Shieldwall" boon: hostile squares (throne/corner/sanctuary) do not help
+   * the attackers capture a defender. Defenders can still be captured between
+   * two attacker pieces.
+   */
+  defenderShieldwall: boolean;
+}
+
+export function defaultRules(variant: Variant): RuleFlags {
+  return {
+    hostileThrone: variant.hostileThrone,
+    hostileCorners: true,
+    defenderShieldwall: false,
+  };
 }

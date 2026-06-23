@@ -3,4 +3,7 @@ export * from "./board";
 export * from "./rules";
 export * from "./game";
 export * from "./ai";
+export * from "./analysis";
+export * from "./share";
+export * from "./saga";
 export * from "./variants";

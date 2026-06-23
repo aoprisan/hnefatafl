@@ -4,6 +4,7 @@ import {
   type AppliedMove,
   type GameStatus,
   type Move,
+  type RuleFlags,
   type Side,
   type Variant,
 } from "./types";
@@ -23,11 +24,13 @@ interface HistoryEntry {
 export class Game {
   private history: HistoryEntry[] = [];
   readonly variant: Variant;
+  readonly rules: RuleFlags | undefined;
 
-  constructor(variant: Variant) {
+  constructor(variant: Variant, rules?: RuleFlags) {
     this.variant = variant;
+    this.rules = rules;
     this.history.push({
-      board: Board.fromVariant(variant),
+      board: Board.fromVariant(variant, rules),
       turn: "defenders",
       status: { kind: "playing" },
       applied: null,

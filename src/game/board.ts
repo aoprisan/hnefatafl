@@ -1,4 +1,11 @@
-import { Piece, type Coord, type Side, type Variant } from "./types";
+import {
+  Piece,
+  defaultRules,
+  type Coord,
+  type RuleFlags,
+  type Side,
+  type Variant,
+} from "./types";
 
 /**
  * An immutable-ish board state. Squares are stored in a flat array indexed by
@@ -8,17 +15,25 @@ import { Piece, type Coord, type Side, type Variant } from "./types";
 export class Board {
   readonly size: number;
   readonly variant: Variant;
+  readonly rules: RuleFlags;
   private readonly cells: Piece[];
+  private readonly blocked: Set<number>;
+  private readonly sanctuaries: Set<number>;
 
-  constructor(variant: Variant, cells?: Piece[]) {
+  constructor(variant: Variant, cells?: Piece[], rules?: RuleFlags) {
     this.variant = variant;
     this.size = variant.size;
+    this.rules = rules ?? defaultRules(variant);
     this.cells = cells ? cells.slice() : new Array(variant.size * variant.size).fill(Piece.Empty);
+    this.blocked = new Set((variant.blocked ?? []).map((c) => c.row * variant.size + c.col));
+    this.sanctuaries = new Set(
+      (variant.sanctuaries ?? []).map((c) => c.row * variant.size + c.col),
+    );
   }
 
   /** Build the starting position for a variant. */
-  static fromVariant(variant: Variant): Board {
-    const board = new Board(variant);
+  static fromVariant(variant: Variant, rules?: RuleFlags): Board {
+    const board = new Board(variant, undefined, rules);
     board.set(variant.king, Piece.King);
     for (const c of variant.defenders) board.set(c, Piece.Defender);
     for (const c of variant.attackers) board.set(c, Piece.Attacker);
@@ -26,7 +41,7 @@ export class Board {
   }
 
   clone(): Board {
-    return new Board(this.variant, this.cells);
+    return new Board(this.variant, this.cells, this.rules);
   }
 
   private idx(c: Coord): number {
@@ -57,6 +72,16 @@ export class Board {
 
   isCorner(c: Coord): boolean {
     return this.variant.corners.some((k) => k.col === c.col && k.row === c.row);
+  }
+
+  /** Impassable terrain (rivers / mountains). */
+  isBlocked(c: Coord): boolean {
+    return this.blocked.has(this.idx(c));
+  }
+
+  /** Sacred grove: passable, hostile while empty, counts as a king wall. */
+  isSanctuary(c: Coord): boolean {
+    return this.sanctuaries.has(this.idx(c));
   }
 
   /**

@@ -18,6 +18,7 @@ import {
 function canTraverse(board: Board, c: Coord, isKing: boolean): boolean {
   if (!board.inBounds(c)) return false;
   if (!board.isEmpty(c)) return false;
+  if (board.isBlocked(c)) return false; // impassable terrain
   if (board.isRestricted(c) && !isKing) return false;
   return true;
 }
@@ -55,12 +56,22 @@ export function allMoves(board: Board, side: Side): Move[] {
  */
 function isAnchor(board: Board, anchor: Coord, side: Side): boolean {
   if (!board.inBounds(anchor)) return false;
-  if (board.isCorner(anchor)) return true;
-  if (board.isThrone(anchor) && board.isEmpty(anchor) && board.variant.hostileThrone) {
+  if (board.isBlocked(anchor)) return false;
+
+  // A friendly piece is always a valid flank.
+  if (Board.sideOf(board.get(anchor)) === side) return true;
+
+  // Hostile squares can help capture, unless the "shieldwall" boon protects the
+  // defenders from the attackers using them.
+  if (side === "attackers" && board.rules.defenderShieldwall) return false;
+
+  if (board.isCorner(anchor) && board.rules.hostileCorners) return true;
+  if (board.isThrone(anchor) && board.isEmpty(anchor) && board.rules.hostileThrone) {
     return true;
   }
-  const p = board.get(anchor);
-  return Board.sideOf(p) === side;
+  if (board.isSanctuary(anchor) && board.isEmpty(anchor)) return true;
+
+  return false;
 }
 
 /**
@@ -103,6 +114,7 @@ export function isKingCaptured(board: Board): boolean {
     const adj: Coord = { col: king.col + dir.col, row: king.row + dir.row };
     if (!board.inBounds(adj)) continue; // edge counts as a wall
     if (board.isThrone(adj) || board.isCorner(adj)) continue; // restricted square counts
+    if (board.isBlocked(adj) || board.isSanctuary(adj)) continue; // terrain counts as a wall
     if (board.get(adj) === Piece.Attacker) continue; // attacker counts
     return false; // open side
   }

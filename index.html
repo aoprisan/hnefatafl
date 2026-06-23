@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#0e1419" />
     <meta
       name="description"
-      content="Hnefatafl (Viking chess) — an installable, offline-capable board game."
+      content="Hnefatafl (Viking chess) — an installable, offline-capable board game with a roguelike Saga campaign."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
@@ -30,6 +30,10 @@
         <div class="controls">
           <button id="new-game" class="btn">New game</button>
           <button id="undo" class="btn">Undo</button>
+          <button id="share" class="btn" title="Copy a link to this game">Share</button>
+          <button id="danger" class="btn toggle" aria-pressed="false" title="Show squares the enemy can capture next turn">
+            👁 Danger
+          </button>
         </div>
 
         <div class="settings">
@@ -42,7 +46,12 @@
             <select id="mode">
               <option value="ai">Human vs AI</option>
               <option value="two-player">Two players</option>
+              <option value="saga">Saga (roguelike)</option>
             </select>
+          </label>
+          <label id="jarl-row">
+            Enemy Jarl
+            <select id="jarl"></select>
           </label>
           <label id="ai-side-row">
             AI plays
@@ -61,12 +70,33 @@
           </label>
         </div>
 
+        <p id="jarl-blurb" class="blurb"></p>
+
+        <!-- Saga campaign UI -->
+        <div id="saga-panel" class="saga hidden">
+          <div class="saga-head">
+            <h2 id="saga-title">Saga</h2>
+            <span id="saga-progress" class="saga-progress"></span>
+          </div>
+          <p id="saga-intro" class="saga-intro"></p>
+          <div id="saga-boons" class="saga-boons"></div>
+          <div id="boon-draft" class="boon-draft hidden">
+            <h3>Choose a boon for your saga</h3>
+            <div id="boon-choices" class="boon-choices"></div>
+          </div>
+          <div class="saga-actions">
+            <button id="saga-start" class="btn">Begin / Restart Saga</button>
+          </div>
+        </div>
+
         <div class="history">
           <h2>Moves</h2>
           <ol id="move-list"></ol>
         </div>
       </section>
     </div>
+
+    <div id="toast" class="toast hidden"></div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
