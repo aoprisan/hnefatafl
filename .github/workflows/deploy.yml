@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["claude/hnefatafl-pwa-typescript-3jy0z6"]
+    branches: ["main"]
   workflow_dispatch:
 
 # Permissions required for GitHub Pages deployment via Actions.
